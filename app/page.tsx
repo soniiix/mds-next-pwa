@@ -1,5 +1,5 @@
 "use client";
-import { MagnifyingGlassIcon, PaperPlaneRightIcon } from "@phosphor-icons/react";
+import { CameraIcon, MagnifyingGlassIcon, PaperPlaneRightIcon, PlusIcon } from "@phosphor-icons/react";
 import { useEffect } from "react";
 
 export default function Home() {
@@ -70,6 +70,12 @@ export default function Home() {
 
                 {/* Input */}
                 <form className="px-6 py-4 border-t border-neutral-200 bg-white flex items-center gap-3">
+                    <a
+                        href="#"
+                        className="flex items-center gap-2 border-neutral-300 border px-4 py-2 rounded-lg hover:bg-neutral-100 h-full transition"
+                    >
+                       <CameraIcon size={19} />
+                    </a>
                     <input
                         type="text"
                         className="flex-1 border border-neutral-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -77,7 +83,7 @@ export default function Home() {
                     />
                     <button
                         type="submit"
-                        className="flex items-center gap-2 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition"
+                        className="flex items-center gap-2 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition cursor-pointer"
                     >
                         Envoyer <PaperPlaneRightIcon size={18} />
                     </button>
