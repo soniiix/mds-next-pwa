@@ -1,6 +1,6 @@
 "use client";
 import { CameraIcon, MagnifyingGlassIcon, PaperPlaneRightIcon, PlusIcon } from "@phosphor-icons/react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 export default function Home() {
     // Register the service worker
@@ -13,14 +13,32 @@ export default function Home() {
         }
     }, []);
 
+    const [isCameraClicked, setIsCameraClicked] = useState(false);
+
     return (
         <main className="flex h-screen bg-neutral-50 text-neutral-900">
+            {/* Camera feature modal */}
+            {isCameraClicked && (
+                <div className="fixed inset-0 bg-black/65 flex items-center justify-center z-50">
+                    <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
+                        <h2 className="text-xl font-bold mb-4">Prendre une photo</h2>
+                        <p className="mb-4">(afficher caméra)</p>
+                        <button
+                            onClick={() => setIsCameraClicked(false)}
+                            className="mt-4 flex items-end bg-blue-500 text-white px-4 py-2 cursor-pointer rounded-lg"
+                        >
+                            Fermer
+                        </button>
+                    </div>
+                </div>
+            )}
+
             {/* SIDEBAR */}
             <aside className="flex flex-col h-full bg-white border-r border-neutral-200 w-80 p-4">
                 <h2 className="text-lg font-bold mb-4">Conversations</h2>
 
                 {/* Search input */}
-                <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-neutral-100 border border-neutral-300 focus-within:ring-2 focus-within:ring-blue-400">
+                <div className="flex items-center gap-2 pl-3 py-2 rounded-lg bg-neutral-100 border border-neutral-300 focus-within:ring-2 focus-within:ring-blue-400">
                     <MagnifyingGlassIcon size={20} className="text-neutral-500" />
                     <input
                         type="text"
@@ -70,12 +88,16 @@ export default function Home() {
 
                 {/* Input */}
                 <form className="px-6 py-4 border-t border-neutral-200 bg-white flex items-center gap-3">
-                    <a
-                        href="#"
-                        className="flex items-center gap-2 border-neutral-300 border px-4 py-2 rounded-lg hover:bg-neutral-100 h-full transition"
+                    <button
+                        className="flex items-center gap-2 border-neutral-300 border px-4 py-2 rounded-lg cursor-pointer hover:bg-neutral-100 h-full transition"
+                        onClick={(e) => {
+                            e.preventDefault();
+                            setIsCameraClicked(e => !e);
+                        }}
+                        title="Prendre une photo"
                     >
                        <CameraIcon size={19} />
-                    </a>
+                    </button>
                     <input
                         type="text"
                         className="flex-1 border border-neutral-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
