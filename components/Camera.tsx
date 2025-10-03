@@ -10,6 +10,7 @@ export const Camera = () => {
     const [error, setError] = useState<boolean>(false);
 
     const startCamera = async () => {
+        setError(false);
         try {
             const stream = await navigator.mediaDevices.getUserMedia({ video: true });
             if (videoRef.current) {
