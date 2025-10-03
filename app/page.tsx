@@ -1,5 +1,7 @@
 "use client";
-import { CameraIcon, MagnifyingGlassIcon, PaperPlaneRightIcon, PlusIcon } from "@phosphor-icons/react";
+
+import { Camera } from "@/components/Camera";
+import { CameraIcon, MagnifyingGlassIcon, PaperPlaneRightIcon, XIcon } from "@phosphor-icons/react";
 import { useEffect, useState } from "react";
 
 export default function Home() {
@@ -20,15 +22,16 @@ export default function Home() {
             {/* Camera feature modal */}
             {isCameraClicked && (
                 <div className="fixed inset-0 bg-black/65 flex items-center justify-center z-50">
-                    <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
-                        <h2 className="text-xl font-bold mb-4">Prendre une photo</h2>
-                        <p className="mb-4">(afficher caméra)</p>
+                    <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full relative">
                         <button
                             onClick={() => setIsCameraClicked(false)}
-                            className="mt-4 flex items-end bg-blue-500 text-white px-4 py-2 cursor-pointer rounded-lg"
+                            className="absolute top-5 right-5 text-neutral-500 hover:text-neutral-700 text-xl font-bold cursor-pointer hover:bg-neutral-200 rounded-full p-2 transition"
+                            aria-label="Fermer"
                         >
-                            Fermer
+                            <XIcon size={24} />
                         </button>
+                        <h2 className="text-xl font-bold mb-5">Prendre une photo</h2>
+                        <div><Camera /></div>
                     </div>
                 </div>
             )}
