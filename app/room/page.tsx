@@ -1,7 +1,7 @@
 "use client";
 
 import { Camera } from "@/components/Camera";
-import { CameraIcon, MagnifyingGlassIcon, PaperPlaneRightIcon, PhoneIcon, UserIcon, XIcon } from "@phosphor-icons/react";
+import { CameraIcon, MagnifyingGlassIcon, PaperPlaneRightIcon, UserIcon, XIcon } from "@phosphor-icons/react";
 import { useEffect, useState } from "react";
 
 export default function Room() {

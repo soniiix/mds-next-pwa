@@ -7,6 +7,7 @@ export const Camera = () => {
     const videoRef = useRef<HTMLVideoElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const [photo, setPhoto] = useState<string | null>(null);
+    const [error, setError] = useState<boolean>(false);
 
     const startCamera = async () => {
         try {
@@ -16,6 +17,7 @@ export const Camera = () => {
             }
         } catch (err) {
             console.error("Camera error:", err);
+            setError(true);
         }
     };
 
@@ -58,7 +60,7 @@ export const Camera = () => {
         <div className="flex flex-col items-center w-full">
             {/* Show the camera */}
             <div className="flex flex-col items-center">
-                {!photo && (
+                {(!photo && !error) && (
                     <video
                         ref={videoRef}
                         autoPlay
@@ -69,7 +71,7 @@ export const Camera = () => {
 
                 <canvas ref={canvasRef} className="hidden"></canvas>
 
-                {!photo && (
+                {(!photo && !error) && (
                     <div className="flex mt-5">
                         {!photo && (
                             <button
@@ -105,7 +107,7 @@ export const Camera = () => {
             )}
 
             {/* Error message if photo couldn't be taken */}
-            {photo === "data:," && (
+            {(photo === "data:," || error) && (
                 <div className="text-red-500 w-full">Une erreur est survenue. Veuillez réessayer.</div>
             )}
         </div>
