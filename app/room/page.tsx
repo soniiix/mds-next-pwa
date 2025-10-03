@@ -1,7 +1,7 @@
 "use client";
 
 import { Camera } from "@/components/Camera";
-import { CameraIcon, MagnifyingGlassIcon, PaperPlaneRightIcon, XIcon } from "@phosphor-icons/react";
+import { CameraIcon, MagnifyingGlassIcon, PaperPlaneRightIcon, PhoneIcon, UserIcon, XIcon } from "@phosphor-icons/react";
 import { useEffect, useState } from "react";
 
 export default function Room() {
@@ -18,7 +18,7 @@ export default function Room() {
     const [isCameraClicked, setIsCameraClicked] = useState(false);
 
     return (
-        <main className="flex h-screen bg-neutral-50 text-neutral-900">
+        <main className="flex flex-1 min-h-0 overflow-hidden bg-neutral-50 text-neutral-900">
             {/* Camera feature modal */}
             {isCameraClicked && (
                 <div className="fixed inset-0 bg-black/65 flex items-center justify-center z-50">
@@ -37,11 +37,11 @@ export default function Room() {
             )}
 
             {/* SIDEBAR */}
-            <aside className="flex flex-col h-full bg-white border-r border-neutral-200 w-80 p-4">
+            <aside className="flex flex-col min-h-0 bg-white border-r border-neutral-200 w-80 p-4">
                 <h2 className="text-lg font-bold mb-4">Conversations</h2>
 
                 {/* Search input */}
-                <div className="flex items-center gap-2 pl-3 py-2 rounded-lg bg-neutral-100 border border-neutral-300 focus-within:ring-2 focus-within:ring-blue-400">
+                <div className="flex items-center gap-2 pl-3 py-2 rounded-lg bg-neutral-100 border border-neutral-200 focus-within:ring-2 focus-within:ring-orange-400">
                     <MagnifyingGlassIcon size={20} className="text-neutral-500" />
                     <input
                         type="text"
@@ -52,7 +52,7 @@ export default function Room() {
 
                 {/* Conversation list */}
                 <div className="mt-6 flex-1 flex flex-col gap-2 overflow-y-auto">
-                    <div className="flex items-center justify-between py-3 px-4 rounded-lg bg-neutral-200/50 text-blue-500 hover:bg-neutral-200/50 cursor-pointer transition">
+                    <div className="flex items-center justify-between py-3 px-4 rounded-lg bg-neutral-200/50 text-orange-500 hover:bg-neutral-200/50 cursor-pointer transition">
                         <span className="font-medium">John Doe</span>
                         <span className="text-xs">2h ago</span>
                     </div>
@@ -64,16 +64,21 @@ export default function Room() {
             </aside>
 
             {/* CHAT AREA */}
-            <section className="flex flex-col flex-1 h-full">
+            <section className="flex flex-col flex-1 min-h-0">
                 {/* Header */}
-                <header className="flex items-center justify-between px-6 py-4 border-b border-neutral-200 bg-white shadow-sm">
-                    <h2 className="font-semibold text-lg">Chat avec John Doe</h2>
+                <header className="flex items-center justify-between px-6 py-3 border-b border-neutral-200 bg-white shadow-sm">
+                    <div className="font-semibold text-lg flex items-center">
+                        <div className="bg-gray-200 text-gray-600 rounded-full w-12 h-12 flex items-center justify-center mr-3">
+                            <UserIcon size={30} className="" />
+                        </div>
+                        <h3>John Doe</h3>
+                    </div>
                 </header>
 
                 {/* Messages */}
                 <div className="flex-1 px-6 py-4 space-y-4 overflow-y-auto bg-neutral-50">
                     <div className="flex justify-end">
-                        <div className="bg-blue-500 text-white px-4 py-2 rounded-lg max-w-xs shadow">
+                        <div className="bg-orange-gradient text-white px-4 py-2 rounded-lg max-w-xs shadow">
                             Salut ! Comment ça va ?
                         </div>
                     </div>
@@ -83,7 +88,7 @@ export default function Room() {
                         </div>
                     </div>
                     <div className="flex justify-end">
-                        <div className="bg-blue-500 text-white px-4 py-2 rounded-lg max-w-xs shadow">
+                        <div className="bg-orange-gradient text-white px-4 py-2 rounded-lg max-w-xs shadow">
                             Oui nickel !
                         </div>
                     </div>
@@ -92,7 +97,7 @@ export default function Room() {
                 {/* Input */}
                 <form className="px-6 py-4 border-t border-neutral-200 bg-white flex items-center gap-3">
                     <button
-                        className="flex items-center gap-2 border-neutral-300 border px-4 py-2 rounded-lg cursor-pointer hover:bg-neutral-100 h-full transition"
+                        className="flex items-center gap-2 border-neutral-200 border px-4 py-2 rounded-lg cursor-pointer hover:bg-neutral-100 h-full transition"
                         onClick={(e) => {
                             e.preventDefault();
                             setIsCameraClicked(e => !e);
@@ -103,12 +108,12 @@ export default function Room() {
                     </button>
                     <input
                         type="text"
-                        className="flex-1 border border-neutral-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="flex-1 border border-neutral-200 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-400"
                         placeholder="Écrivez un message..."
                     />
                     <button
                         type="submit"
-                        className="flex items-center gap-2 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition cursor-pointer"
+                        className="flex items-center gap-2 bg-orange-gradient text-white px-4 py-2 rounded-lg hover:bg-orange-600 transition cursor-pointer"
                     >
                         Envoyer <PaperPlaneRightIcon size={18} />
                     </button>

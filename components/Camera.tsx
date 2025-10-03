@@ -63,7 +63,7 @@ export const Camera = () => {
                         ref={videoRef}
                         autoPlay
                         playsInline
-                        className="rounded-lg w-full border-3 border-blue-500"
+                        className="rounded-lg w-full border-3 border-orange-500"
                     ></video>
                 )}
 
@@ -74,7 +74,7 @@ export const Camera = () => {
                         {!photo && (
                             <button
                                 onClick={takePicture}
-                                className="bg-blue-500 text-white p-3 rounded-full cursor-pointer"
+                                className="bg-orange-500 text-white p-3 rounded-full cursor-pointer"
                             >
                                 <CameraIcon size={24} />
                             </button>

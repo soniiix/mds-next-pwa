@@ -1,1 +1,5 @@
 @import "tailwindcss";
+
+@theme {
+    --background-image-orange-gradient: linear-gradient(145deg, #ed7d4d 100%, #e8a782 100%);
+}

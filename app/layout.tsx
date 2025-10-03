@@ -13,7 +13,7 @@ export default function RootLayout({
 }) {
     return (
         <html lang="en" className={inter.className}>
-            <body className="min-h-screen flex flex-col bg-neutral-50">
+            <body className="min-h-screen flex flex-col bg-neutral-50 selection:bg-orange-500 selection:text-white">
                 <nav className="flex items-center justify-between bg-white border-b border-neutral-200 w-full px-6 py-4">
                     <Link href="/"><img src="icon.svg" alt="Logo" className="h-10 w-10 rounded-lg"/></Link>
                     <div className="flex items-center gap-2">
