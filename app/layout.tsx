@@ -18,7 +18,7 @@ export default function RootLayout({
                     <Link href="/"><img src="icon.svg" alt="Logo" className="h-10 w-10 rounded-lg"/></Link>
                     <div className="flex items-center gap-2">
                         <Link href="/" className="text-orange-500 font-medium px-4 py-2 hover:bg-orange-100/60 rounded-lg transition">Home</Link>
-                        <Link href="/room" className="text-orange-500 font-medium px-4 py-2 hover:bg-orange-100/60 rounded-lg transition">Réception</Link>
+                        <Link href="/room" className="text-orange-500 font-medium px-4 py-2 hover:bg-orange-100/60 rounded-lg transition">Reception</Link>
                         <Link href="/room" className="text-orange-500 font-medium px-4 py-2 hover:bg-orange-100/60 rounded-lg transition">Room</Link>
                         <Link href="/room" className="text-orange-500 font-medium px-4 py-2 hover:bg-orange-100/60 rounded-lg transition">Gallery</Link>
                     </div>

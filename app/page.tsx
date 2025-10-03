@@ -4,7 +4,7 @@ export default function Home() {
             <div className="m-auto flex items-center flex-col gap-4">
                 <h1 className="text-2xl font-bold">Application PWA avec Next.js.</h1>
                 <p className="text-center">
-                    Les technologies utilisées dans cette application incluent&nbsp;
+                    Les technologies utilisées dans cette application sont :&nbsp;
                     <a href="https://fr.react.dev/" className="text-orange-500 underline underline-offset-4" target="_blank" rel="noopener noreferrer">
                         React
                     </a>,&nbsp;
