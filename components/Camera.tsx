@@ -3,6 +3,17 @@
 import { ArrowsClockwiseIcon, CameraIcon, RepeatIcon } from "@phosphor-icons/react";
 import { useEffect, useRef, useState } from "react";
 
+const GALLERY_KEY = "galleryPhotos";
+const addPhotoToGallery = (dataUrl: string) => {
+    try {
+        const prev = JSON.parse(localStorage.getItem(GALLERY_KEY) ?? "[]");
+        const next = [...prev, { id: Date.now(), dataUrl, createdAt: Date.now() }];
+        localStorage.setItem(GALLERY_KEY, JSON.stringify(next));
+    } catch (e) {
+        console.error("Failed to save photo in localStorage:", e);
+    }
+};
+
 export const Camera = () => {
     const videoRef = useRef<HTMLVideoElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -53,7 +64,9 @@ export const Camera = () => {
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
             ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-            setPhoto(canvas.toDataURL("image/png"));
+            const dataUrl = canvas.toDataURL("image/png");
+            setPhoto(dataUrl);
+            addPhotoToGallery(dataUrl);
         }
     };
 

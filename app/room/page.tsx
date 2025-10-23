@@ -37,30 +37,8 @@ export default function Room() {
             )}
 
             {/* SIDEBAR */}
-            <aside className="flex flex-col min-h-0 bg-white border-r border-neutral-200 w-80 p-4">
+            <aside className="flex flex-col min-h-0 bg-white border-r border-neutral-200 w-80 px-6 py-4">
                 <h2 className="text-lg font-bold mb-4">Conversations</h2>
-
-                {/* Search input */}
-                <div className="flex items-center gap-2 pl-3 py-2 rounded-lg bg-neutral-100 border border-neutral-200 focus-within:ring-2 focus-within:ring-orange-400">
-                    <MagnifyingGlassIcon size={20} className="text-neutral-500" />
-                    <input
-                        type="text"
-                        className="flex-1 bg-transparent focus:outline-none"
-                        placeholder="Rechercher..."
-                    />
-                </div>
-
-                {/* Conversation list */}
-                <div className="mt-6 flex-1 flex flex-col gap-2 overflow-y-auto">
-                    <div className="flex items-center justify-between py-3 px-4 rounded-lg bg-neutral-200/50 text-orange-500 hover:bg-neutral-200/50 cursor-pointer transition">
-                        <span className="font-medium">John Doe</span>
-                        <span className="text-xs">2h ago</span>
-                    </div>
-                    <div className="flex items-center justify-between py-3 px-4 rounded-lg hover:bg-neutral-200/50 cursor-pointer transition">
-                        <span className="font-medium">Paul Dupont</span>
-                        <span className="text-xs text-neutral-500">5d ago</span>
-                    </div>
-                </div>
             </aside>
 
             {/* CHAT AREA */}
