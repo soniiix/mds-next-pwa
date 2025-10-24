@@ -74,7 +74,9 @@ export default function Reception() {
     const enterRoom = (roomId: string) => {
         const ok = saveProfile();
         if (!ok) return;
-        router.push(`/room?room=${encodeURIComponent(roomId)}`);
+        const pseudo = name.trim();
+        const params = new URLSearchParams({ room: roomId, pseudo: pseudo });
+        router.push(`/room?${params.toString()}`);
     };
 
     const clearProfile = () => {

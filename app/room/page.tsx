@@ -1,8 +1,10 @@
 "use client";
 
 import { Camera } from "@/components/Camera";
-import { CameraIcon, MagnifyingGlassIcon, PaperPlaneRightIcon, UserIcon, XIcon } from "@phosphor-icons/react";
+import { CameraIcon, PaperPlaneRightIcon, UsersThreeIcon, XIcon } from "@phosphor-icons/react";
 import { useEffect, useState } from "react";
+import { socket } from "@/lib/socket";
+import { useSearchParams } from "next/navigation";
 
 export default function Room() {
     // Register the service worker
@@ -15,7 +17,58 @@ export default function Room() {
         }
     }, []);
 
+    const searchParams = useSearchParams();
+    const roomName = searchParams.get("room");
+    const pseudo = searchParams.get("pseudo");
     const [isCameraClicked, setIsCameraClicked] = useState(false);
+    const [messages, setMessages] = useState<any[]>([]);
+    const [users, setUsers] = useState<Record<string, any>>({});
+    const [inputValue, setInputValue] = useState("");
+
+    // Socket connections and events handling
+    useEffect(() => {
+        if (!socket.connected) socket.connect();
+
+        // Join the room
+        socket.emit("chat-join-room", {
+            pseudo,
+            roomName,
+        });
+
+        // When successfully joined the room
+        socket.on("chat-joined-room", (data) => {
+            console.log("Connecté à la room :", data.roomName);
+            setUsers(data.clients || {});
+        });
+
+        // When a new message is received
+        socket.on("chat-msg", (msg) => {
+            setMessages((prev) => [...prev, msg]);
+        });
+
+        // When a user disconnects
+        socket.on("chat-disconnected", (data) => {
+            console.log(`${data.pseudo} a quitté la room.`);
+        });
+
+        // Cleanup when leaving the page
+        return () => {
+            socket.off("chat-joined-room");
+            socket.off("chat-msg");
+            socket.off("chat-disconnected");
+        };
+    }, [roomName]);
+
+    const sendMessage = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!inputValue.trim()) return;
+
+        socket.emit("chat-msg", {
+            content: inputValue,
+            roomName,
+        });
+        setInputValue("");
+    };
 
     return (
         <main className="flex flex-1 min-h-0 overflow-hidden bg-neutral-50 text-neutral-900">
@@ -38,7 +91,12 @@ export default function Room() {
 
             {/* SIDEBAR */}
             <aside className="flex flex-col min-h-0 bg-white border-r border-neutral-200 w-80 px-6 py-4">
-                <h2 className="text-lg font-bold mb-4">Conversations</h2>
+                <h2 className="text-lg font-bold mb-4">Utilisateurs connectés</h2>
+                <ul className="space-y-2">
+                    {Object.values(users).map((user: any, i) => (
+                        <li key={i} className="text-sm text-neutral-700">{user.pseudo}</li>
+                    ))}
+                </ul>
             </aside>
 
             {/* CHAT AREA */}
@@ -47,51 +105,57 @@ export default function Room() {
                 <header className="flex items-center justify-between px-6 py-3 border-b border-neutral-200 bg-white shadow-sm">
                     <div className="font-semibold text-lg flex items-center">
                         <div className="bg-gray-200 text-gray-600 rounded-full w-12 h-12 flex items-center justify-center mr-3">
-                            <UserIcon size={30} className="" />
+                            <UsersThreeIcon size={30} className="" />
                         </div>
-                        <h3>John Doe</h3>
+                        <h3>Room : {roomName}</h3>
                     </div>
                 </header>
 
                 {/* Messages */}
-                <div className="flex-1 px-6 py-4 space-y-4 overflow-y-auto bg-neutral-50">
-                    <div className="flex justify-end">
-                        <div className="bg-orange-gradient text-white px-4 py-2 rounded-lg max-w-xs shadow">
-                            Salut ! Comment ça va ?
-                        </div>
-                    </div>
-                    <div className="flex justify-start">
-                        <div className="bg-neutral-200 text-neutral-900 px-4 py-2 rounded-lg max-w-xs shadow">
-                            Ça va bien, merci ! Et toi ?
-                        </div>
-                    </div>
-                    <div className="flex justify-end">
-                        <div className="bg-orange-gradient text-white px-4 py-2 rounded-lg max-w-xs shadow">
-                            Oui nickel !
-                        </div>
-                    </div>
+                <div className="flex-1 px-6 py-5 space-y-4 overflow-y-auto max-h-[70vh] bg-neutral-50">
+                    {messages.map((msg, index) => {
+                        const isMe = msg.pseudo === pseudo;
+                        const formattedDate = msg?.dateEmis ? new Date(msg.dateEmis).toLocaleString() : "";
+                        return (
+                            <div key={index} className={`flex ${isMe ? "justify-end" : "justify-start"}`}>
+                                <div className="flex flex-col">
+                                    <div className={`${isMe ? "bg-orange-gradient text-white" : "bg-neutral-200 text-neutral-900"} px-4 py-2 rounded-lg min-w-46 max-w-lg shadow`}>
+                                        <strong className="block text-xs opacity-70 mb-1">{msg.pseudo.toUpperCase()}</strong>
+                                        <div>{msg.content}</div>
+                                    </div>
+                                    {formattedDate && (
+                                        <time dateTime={msg.dateEmis} className="text-[11px] opacity-60 mt-2">
+                                            {formattedDate}
+                                        </time>
+                                    )}
+                                </div>
+                            </div>
+                        );
+                    })}
                 </div>
 
                 {/* Input */}
-                <form className="px-6 py-4 border-t border-neutral-200 bg-white flex items-center gap-3">
-                    <button
+                <form onSubmit={sendMessage} className="px-6 py-4 border-t border-neutral-200 bg-white flex items-center gap-3">
+                    <div
                         className="flex items-center gap-2 border-neutral-200 border px-4 py-2 rounded-lg cursor-pointer hover:bg-neutral-100 h-full transition"
                         onClick={(e) => {
                             e.preventDefault();
-                            setIsCameraClicked(e => !e);
+                            setIsCameraClicked((e) => !e);
                         }}
                         title="Prendre une photo"
                     >
-                       <CameraIcon size={19} />
-                    </button>
+                        <CameraIcon size={19} />
+                    </div>
                     <input
                         type="text"
-                        className="flex-1 border border-neutral-200 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-400"
+                        className="flex-1 border border-neutral-200 rounded-lg px-4 py-2 focus:outline-none focus:border-orange-400 focus:ring-1 focus:ring-orange-400"
                         placeholder="Écrivez un message..."
+                        value={inputValue}
+                        onChange={(e) => setInputValue(e.target.value)}
                     />
                     <button
                         type="submit"
-                        className="flex items-center gap-2 bg-orange-gradient text-white px-4 py-2 rounded-lg hover:bg-orange-600 transition cursor-pointer"
+                        className="flex h-full items-center gap-2 bg-orange-gradient text-white px-4 py-2 rounded-lg hover:bg-orange-600 transition cursor-pointer"
                     >
                         Envoyer <PaperPlaneRightIcon size={18} />
                     </button>
