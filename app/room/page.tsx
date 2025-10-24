@@ -4,9 +4,11 @@ import { Camera } from "@/components/Camera";
 import { CameraIcon, PaperPlaneRightIcon, UsersThreeIcon, XIcon } from "@phosphor-icons/react";
 import { useEffect, useState } from "react";
 import { socket } from "@/lib/socket";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 
 export default function Room() {
+    const router = useRouter();
+
     // Register the service worker
     useEffect(() => {
         if ("serviceWorker" in navigator) {
@@ -20,6 +22,16 @@ export default function Room() {
     const searchParams = useSearchParams();
     const roomName = searchParams.get("room");
     const pseudo = searchParams.get("pseudo");
+
+    const hasValidParams = roomName && pseudo;
+
+    // Redirection si params manquants
+    useEffect(() => {
+        if (!hasValidParams) {
+            router.replace("/reception");
+        }
+    }, [hasValidParams, router]);
+
     const [isCameraClicked, setIsCameraClicked] = useState(false);
     const [messages, setMessages] = useState<any[]>([]);
     const [users, setUsers] = useState<Record<string, any>>({});
