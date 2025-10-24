@@ -17,7 +17,7 @@ export default function Home() {
                     </a>
                 </div>
                 <p className="text-center">
-                    Les technologies utilisées dans cette application sont :&nbsp;
+                    Les technologies utilisées dans cette application sont&nbsp;:&nbsp;
                     <a href="https://fr.react.dev/" className="text-orange-500 underline underline-offset-4" target="_blank" rel="noopener noreferrer">
                         React
                     </a>,&nbsp;
