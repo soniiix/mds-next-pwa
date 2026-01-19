@@ -102,13 +102,13 @@ export default function Room() {
             )}
 
             {/* SIDEBAR */}
-            <aside className="flex flex-col min-h-0 bg-white border-r border-neutral-200 w-80 px-6 py-4">
-                <h2 className="text-lg font-bold mb-4">Utilisateurs connectés</h2>
-                <ul className="space-y-2">
-                    {Object.values(users).map((user: any, i) => (
-                        <li key={i} className="text-sm text-neutral-700">{user.pseudo}</li>
-                    ))}
-                </ul>
+            <aside className="flex flex-col min-h-0 bg-white border-r border-neutral-200 w-80 px-6 py-4 space-y-4">
+                <div>
+                    <span>Utilisateurs connectés : <strong>{Object.keys(users).length}</strong></span>
+                </div>
+                <div>
+                    Connecté en tant que <strong>{pseudo}</strong>
+                </div>
             </aside>
 
             {/* CHAT AREA */}
