@@ -1,7 +1,7 @@
 "use client";
 
 import { Camera } from "@/components/Camera";
-import { CameraIcon, PaperPlaneRightIcon, UsersThreeIcon, XIcon } from "@phosphor-icons/react";
+import { CameraIcon, PaperPlaneRightIcon, UsersThreeIcon, XIcon, MapPinIcon } from "@phosphor-icons/react";
 import { useEffect, useState, useRef } from "react";
 import { socket } from "@/lib/socket";
 import { useSearchParams, useRouter } from "next/navigation";
@@ -176,6 +176,32 @@ export default function Room() {
         }
     };
 
+    const sendLocation = () => {
+        if (!navigator.geolocation) {
+            alert("La géolocalisation n'est pas supportée par votre navigateur.");
+            return;
+        }
+
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                const { latitude, longitude } = position.coords;
+                
+                socket.emit("chat-msg", {
+                    content: `📍 Localisation: ${latitude.toFixed(4)}, ${longitude.toFixed(4)}`,
+                    latitude,
+                    longitude,
+                    roomName,
+                });
+                
+                console.log(`Localisation envoyée: ${latitude}, ${longitude}`);
+            },
+            (error) => {
+                console.error("Erreur géolocalisation:", error);
+                alert("Impossible d'accéder à votre localisation.");
+            }
+        );
+    };
+
     return (
         <main className="flex flex-1 min-h-0 overflow-hidden bg-neutral-50 text-neutral-900">
             {/* Camera feature modal */}
@@ -262,6 +288,14 @@ export default function Room() {
                     >
                         <CameraIcon size={19} />
                     </div>
+                    <button
+                        type="button"
+                        onClick={sendLocation}
+                        className="flex items-center gap-2 border-neutral-200 border px-4 py-2 rounded-lg cursor-pointer hover:bg-neutral-100 h-full transition"
+                        title="Envoyer ma localisation"
+                    >
+                        <MapPinIcon size={19} />
+                    </button>
                     <input
                         type="text"
                         className="flex-1 border border-neutral-200 rounded-lg px-4 py-2 focus:outline-none focus:border-orange-400 focus:ring-1 focus:ring-orange-400"
