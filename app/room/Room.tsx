@@ -25,7 +25,7 @@ export default function Room() {
 
     const hasValidParams = roomName && pseudo;
 
-    // Redirection si params manquants
+    // Redirect if parameters are missing
     useEffect(() => {
         if (!hasValidParams) {
             router.replace("/reception");
@@ -37,6 +37,33 @@ export default function Room() {
     const [users, setUsers] = useState<Record<string, any>>({});
     const [inputValue, setInputValue] = useState("");
     const messagesEndRef = useRef<HTMLDivElement | null>(null);
+
+    const fetchImageFromServer = async (imageId: string) => {
+        try {
+            const response = await fetch(`https://api.tools.gavago.fr/socketio/api/images/${imageId}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error('Erreur lors de la récupération de l\'image.');
+            }
+
+            const data = await response.json();
+
+            if (!data.success) {
+                console.error('Erreur serveur:', data.message);
+                return null;
+            }
+
+            return data.data_image;
+        } catch (error) {
+            console.error('Erreur fetch image:', error);
+            return null;
+        }
+    };
 
     // Socket connections and events handling
     useEffect(() => {
@@ -50,18 +77,23 @@ export default function Room() {
 
         // When successfully joined the room
         socket.on("chat-joined-room", (data) => {
-            console.log("Connecté à la room :", data.roomName);
             setUsers(data.clients || {});
         });
 
-        // When a new message is received
-        socket.on("chat-msg", (msg) => {
-            setMessages((prev) => [...prev, msg]);
-        });
-
-        // When a user disconnects
-        socket.on("chat-disconnected", (data) => {
-            console.log(`${data.pseudo} a quitté la room.`);
+        socket.on("chat-msg", async (msg) => {
+            // If it's an image message
+            if (msg.categorie === "NEW_IMAGE" && msg.id_image) {
+                const imageData = await fetchImageFromServer(msg.id_image);
+                if (imageData) {
+                    setMessages((prev) => [...prev, {
+                        ...msg,
+                        image_data: imageData,
+                    }]);
+                }
+            } else if (msg.content && !msg.content.startsWith("[IMAGE]")) {
+                // Normal text message (ignore placeholder messages)
+                setMessages((prev) => [...prev, msg]);
+            }
         });
 
         // Cleanup when leaving the page
@@ -70,7 +102,7 @@ export default function Room() {
             socket.off("chat-msg");
             socket.off("chat-disconnected");
         };
-    }, [roomName]);
+    }, [roomName, pseudo]);
 
     // Auto-scroll to the latest message
     useEffect(() => {
@@ -88,6 +120,62 @@ export default function Room() {
         setInputValue("");
     };
 
+    const compressImage = (dataUrl: string, quality: number = 0.7): Promise<string> => {
+        return new Promise((resolve) => {
+            const img = new Image();
+            img.src = dataUrl;
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                
+                // Resize to 70% of original
+                canvas.width = img.width * 0.7;
+                canvas.height = img.height * 0.7;
+                
+                if (ctx) {
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    const compressedUrl = canvas.toDataURL('image/jpeg', quality);
+                    resolve(compressedUrl);
+                }
+            };
+        });
+    };
+
+    const sendImageMessage = async (dataUrl: string) => {
+        console.log("Compression de l'image...");
+        
+        try {
+            const compressedDataUrl = await compressImage(dataUrl);
+            
+            console.log("Envoi de l'image compressée au serveur...");
+            const response = await fetch(`https://api.tools.gavago.fr/socketio/api/images/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ id: socket.id, image_data: compressedDataUrl })
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: Erreur lors de l'envoi de l'image.`);
+            }
+
+            const data = await response.json();
+            console.log('Image enregistrée avec succès:', data);    
+            
+            socket.emit("chat-msg", {
+                categorie: "NEW_IMAGE",
+                id_image: socket.id,
+                roomName,
+            });
+        } catch (error) {
+            console.error('Erreur:', error);
+            alert(`Erreur: ${error instanceof Error ? error.message : 'Impossible d\'envoyer l\'image'}`);
+        } finally {
+            setIsCameraClicked(false);
+        }
+    };
+
     return (
         <main className="flex flex-1 min-h-0 overflow-hidden bg-neutral-50 text-neutral-900">
             {/* Camera feature modal */}
@@ -102,7 +190,9 @@ export default function Room() {
                             <XIcon size={24} />
                         </button>
                         <h2 className="text-xl font-bold mb-5">Prendre une photo</h2>
-                        <div><Camera /></div>
+                        <div>
+                            <Camera onSendAction={sendImageMessage} />
+                        </div>
                     </div>
                 </div>
             )}
@@ -137,9 +227,16 @@ export default function Room() {
                         return (
                             <div key={index} className={`flex ${isMe ? "justify-end" : "justify-start"}`}>
                                 <div className="flex flex-col">
-                                    <div className={`${isMe ? "bg-orange-gradient text-white" : "bg-neutral-200 text-neutral-900"} px-4 py-2 rounded-lg min-w-46 max-w-lg shadow`}>
-                                        <strong className="block text-xs opacity-70 mb-1">{msg.pseudo.toUpperCase()}</strong>
-                                        <div>{msg.content}</div>
+                                    <div className={`${isMe ? "bg-orange-gradient text-white" : "bg-neutral-200 text-neutral-900"} px-4 py-2 rounded-lg min-w-46 max-w-lg shadow break-words`}>
+                                        <strong className="block text-xs opacity-70 mb-1">{msg.pseudo?.toUpperCase()}</strong>
+                                        {msg.image_data ? (
+                                            <img
+                                                src={msg.image_data}
+                                                className="rounded-lg max-w-full h-auto max-h-64 object-contain"
+                                            />
+                                        ) : (
+                                            <div>{msg.content}</div>
+                                        )}
                                     </div>
                                     {formattedDate && (
                                         <time dateTime={msg.dateEmis} className="text-[11px] opacity-60 mt-2">

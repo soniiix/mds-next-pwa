@@ -45,7 +45,7 @@ const showNotification = async () => {
     }
 };
 
-export const Camera = () => {
+export const Camera = ({ onSendAction }: { onSendAction: (dataUrl: string) => void }) => {
     const videoRef = useRef<HTMLVideoElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const [photo, setPhoto] = useState<string | null>(null);
@@ -145,13 +145,19 @@ export const Camera = () => {
                         className="rounded-lg border-3 border-gray-500 w-full"
                     />
 
-                    <div className="flex items-center justify-center mt-5 h-12">
+                    <div className="flex items-center justify-center gap-3 mt-5">
                         <button
                             onClick={() => setPhoto(null)}
                             className="bg-gray-500 flex items-center gap-2 text-white px-4 py-2 cursor-pointer transition rounded-lg hover:bg-gray-600"
                         >
                             Reprendre
                             <ArrowsClockwiseIcon size={17}/>
+                        </button>
+                        <button
+                            onClick={() => onSendAction(photo)}
+                            className="bg-orange-500 flex items-center gap-2 text-white px-4 py-2 cursor-pointer transition rounded-lg hover:bg-orange-600"
+                        >
+                            Envoyer
                         </button>
                     </div>
                 </div>
