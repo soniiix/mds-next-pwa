@@ -1,10 +1,8 @@
 "use client";
 
-export const dynamic = "force-dynamic";
-
 import { Camera } from "@/components/Camera";
 import { CameraIcon, PaperPlaneRightIcon, UsersThreeIcon, XIcon } from "@phosphor-icons/react";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, Suspense } from "react";
 import { socket } from "@/lib/socket";
 import { useSearchParams, useRouter } from "next/navigation";
 
@@ -91,7 +89,8 @@ export default function Room() {
     };
 
     return (
-        <main className="flex flex-1 min-h-0 overflow-hidden bg-neutral-50 text-neutral-900">
+        <Suspense fallback={<div>Chargement...</div>}>
+            <main className="flex flex-1 min-h-0 overflow-hidden bg-neutral-50 text-neutral-900">
             {/* Camera feature modal */}
             {isCameraClicked && (
                 <div className="fixed inset-0 bg-black/65 flex items-center justify-center z-50">
@@ -182,6 +181,7 @@ export default function Room() {
                     </button>
                 </form>
             </section>
-        </main>
+            </main>
+        </Suspense>
     );
 }
