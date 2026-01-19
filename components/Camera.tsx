@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowsClockwiseIcon, CameraIcon, RepeatIcon } from "@phosphor-icons/react";
+import { ArrowsClockwiseIcon, CameraIcon } from "@phosphor-icons/react";
 import { useEffect, useRef, useState } from "react";
 
 const GALLERY_KEY = "galleryPhotos";
@@ -11,6 +11,37 @@ const addPhotoToGallery = (dataUrl: string) => {
         localStorage.setItem(GALLERY_KEY, JSON.stringify(next));
     } catch (e) {
         console.error("Failed to save photo in localStorage:", e);
+    }
+};
+
+const showNotification = async () => {
+    if (!("Notification" in window)) {
+        console.log("Ce navigateur ne supporte pas les notifications");
+        return;
+    }
+
+    // Request permission if not already granted
+    if (Notification.permission === "default") {
+        await Notification.requestPermission();
+    }
+
+    // Display notification if granted
+    if (Notification.permission === "granted") {
+        if ("serviceWorker" in navigator && navigator.serviceWorker.controller) {
+            navigator.serviceWorker.ready.then((registration) => {
+                registration.showNotification("Photo capturée", {
+                    body: "Photo prise et enregistrée dans la galerie",
+                    icon: "/icon.svg",
+                    badge: "/icon.svg",
+                });
+            });
+        } else {
+            // Fallback without Service Worker
+            new Notification("Photo capturée", {
+                body: "Photo prise et enregistrée dans la galerie",
+                icon: "/icon.svg",
+            });
+        }
     }
 };
 
@@ -36,6 +67,11 @@ export const Camera = () => {
     // Launch camera on component mount
     useEffect(() => {
         startCamera();
+
+        // Request notification permission on mount
+        if ("Notification" in window && Notification.permission === "default") {
+            Notification.requestPermission();
+        }
 
         return () => {
             if (videoRef.current && videoRef.current.srcObject) {
@@ -67,6 +103,7 @@ export const Camera = () => {
             const dataUrl = canvas.toDataURL("image/png");
             setPhoto(dataUrl);
             addPhotoToGallery(dataUrl);
+            showNotification();
         }
     };
 
@@ -90,7 +127,7 @@ export const Camera = () => {
                         {!photo && (
                             <button
                                 onClick={takePicture}
-                                className="bg-orange-500 text-white p-3 rounded-full cursor-pointer"
+                                className="bg-orange-500 text-white p-3 rounded-full cursor-pointer hover:bg-orange-600 transition"
                             >
                                 <CameraIcon size={24} />
                             </button>
