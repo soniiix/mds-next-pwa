@@ -2,7 +2,7 @@
 
 import { Camera } from "@/components/Camera";
 import { CameraIcon, PaperPlaneRightIcon, UsersThreeIcon, XIcon } from "@phosphor-icons/react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { socket } from "@/lib/socket";
 import { useSearchParams, useRouter } from "next/navigation";
 
@@ -36,6 +36,7 @@ export default function Room() {
     const [messages, setMessages] = useState<any[]>([]);
     const [users, setUsers] = useState<Record<string, any>>({});
     const [inputValue, setInputValue] = useState("");
+    const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
     // Socket connections and events handling
     useEffect(() => {
@@ -70,6 +71,11 @@ export default function Room() {
             socket.off("chat-disconnected");
         };
     }, [roomName]);
+
+    // Auto-scroll to the latest message
+    useEffect(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }, [messages]);
 
     const sendMessage = (e: React.FormEvent) => {
         e.preventDefault();
@@ -144,6 +150,7 @@ export default function Room() {
                             </div>
                         );
                     })}
+                    <div ref={messagesEndRef} />
                 </div>
 
                 {/* Input */}
