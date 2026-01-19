@@ -1,5 +1,7 @@
 "use client";
 
+export const dynamic = "force-dynamic";
+
 import { Camera } from "@/components/Camera";
 import { CameraIcon, PaperPlaneRightIcon, UsersThreeIcon, XIcon } from "@phosphor-icons/react";
 import { useEffect, useState, useRef } from "react";
