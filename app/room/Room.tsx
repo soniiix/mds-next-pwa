@@ -1,7 +1,7 @@
 "use client";
 
 import { Camera } from "@/components/Camera";
-import { CameraIcon, PaperPlaneRightIcon, UsersThreeIcon, XIcon, MapPinIcon } from "@phosphor-icons/react";
+import { CameraIcon, PaperPlaneRightIcon, UsersThreeIcon, XIcon, MapPinIcon, BatteryHighIcon } from "@phosphor-icons/react";
 import { useEffect, useState, useRef } from "react";
 import { socket } from "@/lib/socket";
 import { useSearchParams, useRouter } from "next/navigation";
@@ -65,6 +65,14 @@ export default function Room() {
         }
     };
 
+    // Extract pseudo from image message content like:
+    // "SERVER: Nouvelle image pour le user {pseudo}."
+    const extractPseudoFromImageContent = (content?: string | null) => {
+        if (!content) return null;
+        const match = content.match(/Nouvelle image pour le user\s+([^.]+)/i);
+        return match?.[1]?.trim() ?? null;
+    };
+
     // Socket connections and events handling
     useEffect(() => {
         if (!socket.connected) socket.connect();
@@ -81,14 +89,18 @@ export default function Room() {
         });
 
         socket.on("chat-msg", async (msg) => {
-            // If it's an image message
             if (msg.categorie === "NEW_IMAGE" && msg.id_image) {
                 const imageData = await fetchImageFromServer(msg.id_image);
                 if (imageData) {
-                    setMessages((prev) => [...prev, {
-                        ...msg,
-                        image_data: imageData,
-                    }]);
+                    const pseudoFromContent = extractPseudoFromImageContent(msg.content);
+                    setMessages((prev) => [
+                        ...prev,
+                        {
+                            ...msg,
+                            pseudo: pseudoFromContent ?? msg.pseudo,
+                            image_data: imageData,
+                        },
+                    ]);
                 }
             } else if (msg.content && !msg.content.startsWith("[IMAGE]")) {
                 // Normal text message (ignore placeholder messages)
@@ -128,7 +140,6 @@ export default function Room() {
                 const canvas = document.createElement('canvas');
                 const ctx = canvas.getContext('2d');
                 
-                // Resize to 70% of original
                 canvas.width = img.width * 0.7;
                 canvas.height = img.height * 0.7;
                 
@@ -142,12 +153,9 @@ export default function Room() {
     };
 
     const sendImageMessage = async (dataUrl: string) => {
-        console.log("Compression de l'image...");
-        
         try {
             const compressedDataUrl = await compressImage(dataUrl);
             
-            console.log("Envoi de l'image compressée au serveur...");
             const response = await fetch(`https://api.tools.gavago.fr/socketio/api/images/`, {
                 method: 'POST',
                 headers: {
@@ -161,7 +169,6 @@ export default function Room() {
             }
 
             const data = await response.json();
-            console.log('Image enregistrée avec succès:', data);    
             
             socket.emit("chat-msg", {
                 categorie: "NEW_IMAGE",
@@ -192,14 +199,16 @@ export default function Room() {
                     longitude,
                     roomName,
                 });
-                
-                console.log(`Localisation envoyée: ${latitude}, ${longitude}`);
             },
             (error) => {
                 console.error("Erreur géolocalisation:", error);
                 alert("Impossible d'accéder à votre localisation.");
             }
         );
+    };
+
+    const sendBattery = () => {
+        alert("TODO");
     };
 
     return (
@@ -295,6 +304,14 @@ export default function Room() {
                         title="Envoyer ma localisation"
                     >
                         <MapPinIcon size={19} />
+                    </button>
+                    <button
+                        type="button"
+                        onClick={sendBattery}
+                        className="flex items-center gap-2 border-neutral-200 border px-4 py-2 rounded-lg cursor-pointer hover:bg-neutral-100 h-full transition"
+                        title="Envoyer le niveau de batterie"
+                    >
+                        <BatteryHighIcon size={19} />
                     </button>
                     <input
                         type="text"
