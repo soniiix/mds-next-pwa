@@ -50,17 +50,31 @@ export const Camera = ({ onSendAction }: { onSendAction: (dataUrl: string) => vo
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const [photo, setPhoto] = useState<string | null>(null);
     const [error, setError] = useState<boolean>(false);
+    const streamRef = useRef<MediaStream | null>(null);
 
     const startCamera = async () => {
         setError(false);
         try {
             const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+            streamRef.current = stream;
+
             if (videoRef.current) {
                 videoRef.current.srcObject = stream;
             }
         } catch (err) {
             console.error("Camera error:", err);
             setError(true);
+        }
+    };
+
+    const stopCamera = () => {
+        if (streamRef.current) {
+            streamRef.current.getTracks().forEach(track => track.stop());
+            streamRef.current = null;
+        }
+
+        if (videoRef.current) {
+            videoRef.current.srcObject = null;
         }
     };
 
@@ -102,6 +116,7 @@ export const Camera = ({ onSendAction }: { onSendAction: (dataUrl: string) => vo
             ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
             const dataUrl = canvas.toDataURL("image/png");
             setPhoto(dataUrl);
+            stopCamera();
             addPhotoToGallery(dataUrl);
             showNotification();
         }
