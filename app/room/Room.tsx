@@ -207,8 +207,8 @@ export default function Room() {
         );
     };
 
-    const sendBattery = () => {
-        alert("TODO");
+    const sendBattery = async () => {
+        alert("not implemented yet");
     };
 
     return (
@@ -258,7 +258,21 @@ export default function Room() {
                 <div className="flex-1 px-6 py-5 space-y-4 overflow-y-auto max-h-[70vh] bg-neutral-50">
                     {messages.map((msg, index) => {
                         const isMe = msg.pseudo === pseudo;
+                        const isServer = msg.pseudo === "SERVER" || msg.pseudo?.toUpperCase() === "SERVER";
                         const formattedDate = msg?.dateEmis ? new Date(msg.dateEmis).toLocaleString() : "";
+
+                        // Server messages: centered line
+                        if (isServer) {
+                            return (
+                                <div key={index} className="flex justify-center my-2">
+                                    <div className="text-xs text-neutral-500 bg-neutral-200/60 px-4 py-1.5 rounded-full">
+                                        {msg.content}
+                                    </div>
+                                </div>
+                            );
+                        }
+
+                        // User messages: bubbles
                         return (
                             <div key={index} className={`flex ${isMe ? "justify-end" : "justify-start"}`}>
                                 <div className="flex flex-col">
