@@ -15,6 +15,11 @@ const addPhotoToGallery = (dataUrl: string) => {
 };
 
 const showNotification = async () => {
+    // Trigger vibration if supported
+    if ('vibrate' in navigator) {
+        navigator.vibrate(200); // 200ms vibration
+    }
+
     if (!("Notification" in window)) {
         console.log("Ce navigateur ne supporte pas les notifications");
         return;
